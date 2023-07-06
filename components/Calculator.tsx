@@ -1,4 +1,4 @@
-import Grid2 from "@mui/material/Unstable_Grid2";
+import Grid2 from '@mui/material/Unstable_Grid2';
 import {
   Box,
   Paper,
@@ -8,33 +8,41 @@ import {
   Button,
   Divider,
   Typography,
-} from "@mui/material";
-import { OutlinedInput } from "@mui/material";
-import axios from "axios";
+} from '@mui/material';
+import { OutlinedInput } from '@mui/material';
+import axios from 'axios';
+import { useState, useRef, useEffect, ChangeEvent, FormEvent } from 'react';
 
-import { useState, useRef, useEffect } from "react";
+const Calculator = (): JSX.Element => {
+  const [operation, setOperation] = useState('');
+  const [result, setResult] = useState('');
+  const firstRef = useRef<HTMLInputElement | null>(null);
+  const secondRef = useRef<HTMLInputElement | null>(null);
+  const welcomeMessage = 'Calculator is ready!';
 
-const Calculator = () => {
-  const [operation, setOperation] = useState("");
-  const [result, setResult] = useState("");
-  const firstRef = useRef(null);
-  const secondRef = useRef(null);
-  const welcomeMessage = "Calculator is ready!";
-
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
     setOperation(e.target.value);
   };
 
-  useEffect(() => {
+  useEffect((): void => {
     setResult(welcomeMessage);
   }, []);
 
-  const handleCalculate = (e) => {
+  const handleCalculate = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
+    let firstRefCurrentValue = '';
+    let secondRefCurrentValue = '';
+    if (firstRef.current) {
+      firstRefCurrentValue = firstRef.current.value;
+    }
+    if (secondRef.current) {
+      secondRefCurrentValue = secondRef.current.value;
+    }
+
     const query = {
       operation: operation,
-      first: firstRef.current.value,
-      second: secondRef.current.value,
+      first: firstRefCurrentValue,
+      second: secondRefCurrentValue,
     };
 
     axios
@@ -47,13 +55,18 @@ const Calculator = () => {
       });
   };
 
-  const handleReset = (e) => {
+  const handleReset = (e: React.MouseEvent<HTMLButtonElement>): void => {
     e.preventDefault();
-    setOperation("");
+    setOperation('');
     setResult(welcomeMessage);
-    firstRef.current.value = null;
-    secondRef.current.value = null;
-    document.querySelector("#operation").selectedIndex = 0;
+    firstRef.current!.value = '';
+    secondRef.current!.value = '';
+
+    const operationSelect =
+      document.querySelector<HTMLSelectElement>('#operation');
+    if (operationSelect) {
+      operationSelect.selectedIndex = 0;
+    }
   };
 
   return (
@@ -73,18 +86,18 @@ const Calculator = () => {
           <FormControl fullWidth>
             <NativeSelect
               input={<OutlinedInput />}
-              defaultValue={""}
+              defaultValue={''}
               inputProps={{
-                name: "operation",
-                id: "operation",
+                name: 'operation',
+                id: 'operation',
               }}
               onChange={handleChange}
             >
               <option value="">Op</option>
-              <option value={"add"}>+</option>
-              <option value={"subtract"}>-</option>
-              <option value={"multiply"}>*</option>
-              <option value={"divide"}>/</option>
+              <option value={'add'}>+</option>
+              <option value={'subtract'}>-</option>
+              <option value={'multiply'}>*</option>
+              <option value={'divide'}>/</option>
             </NativeSelect>
           </FormControl>
         </Grid2>
@@ -107,7 +120,7 @@ const Calculator = () => {
         </Grid2>
         <Grid2 xs={2}>
           <FormControl fullWidth>
-            <Button variant="outlines" onClick={handleReset}>
+            <Button variant="outlined" onClick={handleReset}>
               Reset
             </Button>
           </FormControl>
@@ -129,31 +142,3 @@ const Calculator = () => {
   );
 };
 export default Calculator;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

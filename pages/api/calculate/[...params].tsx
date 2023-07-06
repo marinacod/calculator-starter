@@ -1,38 +1,45 @@
-import { add, subtract, multiply, divide } from "../../../utils/calculate";
+import { add, subtract, multiply, divide } from '../../../utils/calculate';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
-export default function handler(req, res) {
+interface Params {
+  operation: string;
+  first: number;
+  second: number;
+}
+
+export default function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    if (req.method !== "GET") {
+    if (req.method !== 'GET') {
       throw new Error(
         `Unsupported method ${req.method}. Only GET method is supported`
       );
     }
 
-    const params = extractParams(req.query.params);
+    const params = extractParams(req.query.params as string);
     let result;
     switch (params.operation) {
-      case "add":
+      case 'add':
         result = add(params.first, params.second);
         break;
-      case "subtract":
+      case 'subtract':
         result = subtract(params.first, params.second);
         break;
-      case "multiply":
+      case 'multiply':
         result = multiply(params.first, params.second);
         break;
-      case "divide":
+      case 'divide':
         result = divide(params.first, params.second);
         break;
       default:
         throw new Error(`Unsupported operation ${params.operation}`);
     }
     res.status(200).json({ result });
-  } catch (e) {
+  } catch (e: any) {
     res.status(500).json({ message: e.message });
   }
 }
 
-function extractParams(queryParams) {
+function extractParams(queryParams: string[] | string): Params {
   if (queryParams.length !== 3) {
     throw new Error(
       `Query params should have 3 items. Received ${queryParams.length}: ${queryParams}`
@@ -40,7 +47,7 @@ function extractParams(queryParams) {
   }
 
   try {
-    const params = {
+    const params: Params = {
       operation: queryParams[0],
       first: parseInt(queryParams[1]),
       second: parseInt(queryParams[2]),
@@ -50,4 +57,3 @@ function extractParams(queryParams) {
     throw new Error(`Failed to process query params. Received: ${queryParams}`);
   }
 }
-
